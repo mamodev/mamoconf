@@ -59,7 +59,7 @@ done
 
 SCRIPT_SOURCING="#<<< START MAMOCONF INSTALL >>>"
 # ADD source ~/.config/scripts/*.ssource
-for script in "$HOME/.config/scripts"/*.ssource; do
+for script in "$CFG_PTH/scripts"/*.ssource; do
     if [[ -f "$script" ]]; then
         SCRIPT_SOURCING+="\nsource $script"
     fi
