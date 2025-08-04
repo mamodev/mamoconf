@@ -78,8 +78,11 @@ if [[ "$answer" != "Y" && "$answer" != "y" && "$answer" != "" ]]; then
         fi
         
         echo -e "$SCRIPT_SOURCING" >> "$custom_path"
+    else 
+        echo "File not found: ${custom_path}"
     fi
 
+    exit 0
 fi
 
 # Check if bashrc present
