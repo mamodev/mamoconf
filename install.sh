@@ -75,7 +75,7 @@ if [[ "$answer" != "Y" && "$answer" != "y" && "$answer" != "" ]]; then
     if [ -f "$custom_path" ]; then 
         if grep -q "#<<< START MAMOCONF INSTALL >>>" "$custom_path"; then
             echo "Removing existing mamoconf block from custom path"
-            sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$cutom_path"
+            sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$custom_path"
         fi
         
         echo -e "$SCRIPT_SOURCING" >> "$custom_path"
