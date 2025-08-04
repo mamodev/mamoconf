@@ -23,8 +23,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     OS='macos'
     configs=( "${globals[@]} ${macos[@]}" )
 else 
-    echo "curremtly not supported OS"
-    exit 1
 fi
 
 error="no"
