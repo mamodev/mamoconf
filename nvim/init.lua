@@ -15,22 +15,32 @@ vim.opt.timeoutlen = 400
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.signcolumn = "yes"
 
+vim.opt.undofile = true
+
 vim.cmd(":hi statusline guibg=NONE")
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+local issue_insert_nop = function()
+    local seq = vim.api.nvim_replace_termcodes(" <BS>", true, false, true)
+    vim.api.nvim_feedkeys(seq, "n", true)
+end
+
 local esc_insert_mode = function()
     if pcall(require, "copilot") then
         local cs = require("copilot.suggestion")
-        if cs.is_visible() then
-            cs.dismiss()
-            return ""
+        if not vim.b.copilot_suggestion_hidden then
+            vim.b.copilot_suggestion_hidden = true
+            -- cs.dismiss()
+            issue_insert_nop()
+            return
         end
     end
     return "<Esc>"
 end
 
+vim.keymap.set('n', '-', ":Oil<CR>", { desc = "Open Oil file explorer" })
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
 vim.keymap.set('n', '<leader>w', ':write<CR>')
 vim.keymap.set('n', '<leader>q', ':quit<CR>')
@@ -38,8 +48,61 @@ vim.keymap.set('i', 'jk', esc_insert_mode, { expr = true, silent = true })
 vim.keymap.set('i', '<Esc>', esc_insert_mode, { expr = true, silent = true })
 
 vim.keymap.set('n', '<leader>ff', ':Pick files<CR>')
--- vim.keymap.set('n', '<leader>fb', ':Pick buffers<CR>')
 vim.keymap.set('n', '<leader>fg', ':Pick grep live<CR>')
+
+vim.keymap.set('i', '<D-l>', function()
+    if pcall(require, 'copilot') then
+        local cp = require('copilot.suggestion')
+        if not vim.b.copilot_suggestion_hidden then
+            cp.accept_line()
+            vim.b.copilot_suggestion_hidden = true
+        else
+            vim.b.copilot_suggestion_hidden = false
+            issue_insert_nop()
+        end
+    end
+end, {expr = true, silent = true})
+
+vim.keymap.set('i', '<D-Bslash>', function()
+    if pcall(require, 'copilot') then
+        local cp = require('copilot.suggestion')
+        if not vim.b.copilot_suggestion_hidden then
+            cp.accept_word()
+            vim.b.copilot_suggestion_hidden = true
+        else
+            vim.b.copilot_suggestion_hidden = false
+            issue_insert_nop()
+        end
+    end
+end, {expr = true, silent = true})
+
+vim.keymap.set('i', '<D-]>', function()
+    if pcall(require, 'copilot') then
+        local cp = require('copilot.suggestion')
+        if cp.is_visible() then
+            cp.next()
+        end
+    end
+end, {expr = true, silent = true})
+
+vim.keymap.set('i', '<D-[>', function()
+    if pcall(require, 'copilot') then
+        local cp = require('copilot.suggestion')
+        if cp.is_visible() then
+            cp.prev()
+        end
+    end
+end, {expr = true, silent = true})
+
+
+-- vim.keymap.set('i', '<S-D-Bslash>', function()
+--     if pcall(require, 'copilot') then
+--         local cp = require('copilot.suggestion')
+--         cp.toggle_auto_trigger()
+--     end
+-- end, {expr = true, silent = true})
+
+-- vim.keymap.set('n', '<leader>fb', ':Pick buffers<CR>')
 -- MiniPick.builtin.cli({ command = { 'echo', 'a\nb\nc' } })
 -- vim.keymap.set('n', '<leader>fb', function()
 --     if not pcall(require, "mini.pick") then
@@ -164,13 +227,25 @@ require("lazy").setup({
     checker = { enabled = true, notify = false },
     spec = {
         {
+              'chomosuke/typst-preview.nvim',
+              version = '1.*',
+              opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+        },
+        {
             'chipsenkbeil/distant.nvim',
             branch = 'v0.3',
             config = function()
                 require('distant'):setup()
             end
         },
-        { "nvim-tree/nvim-web-devicons", opts = {} },
+        {   "nvim-tree/nvim-web-devicons", opts = {} },
+        {
+            'stevearc/oil.nvim',
+            lazy = false,
+            config = function ()
+                require('oil').setup()
+            end
+        },
         {
             'echasnovski/mini.nvim',
             version = '*',
@@ -195,8 +270,8 @@ require("lazy").setup({
                 require("copilot").setup({
                     suggestion = {
                         enabled = true,
-                        auto_trigger = false,
-                        trigger_on_accept = true,
+                        auto_trigger = true,
+                        trigger_on_accept = false,
                         keymaps = {
                           accept = false,
                           accept_word = false,
@@ -213,6 +288,8 @@ require("lazy").setup({
                         ["*"] = true
                     }
                 })
+
+                vim.b.copilot_suggestion_hidden = true
 
             end,
         },
