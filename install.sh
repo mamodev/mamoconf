@@ -23,6 +23,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     OS='macos'
     configs=( "${globals[@]} ${macos[@]}" )
 else 
+    OS='unkown'
+    configs=( "${globals[@]}" )
 fi
 
 error="no"
