@@ -1,0 +1,3 @@
+alias noam="ssh -i ~/.ssh/fd_unipi torquati@noam.unipi.it"
+alias mamodeh="ssh mamo@mamodeh.ddns.net"
+

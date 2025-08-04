@@ -1,6 +1,19 @@
 #!/bin/bash
 set -e
 
+# Check if custom config path is passed as arg
+CFG_PTH="$1"
+if [ -z "$CFG_PTH" ]; then
+    CFG_PTH="${XDG_CONFIG_HOME:-$HOME/.config}"
+    echo "No custom config path provided. Using default: $CFG_PTH"
+else
+    echo "Using custom config path: $CFG_PTH"
+    if [ ! -d "$CFG_PTH" ]; then
+        echo "Custom config path does not exist. Creating it: $CFG_PTH"
+        exit 0
+    fi
+fi
+
 # This script install all config folders and files to the home directory
 globals=( "nvim" "alacritty" "scripts")
 macos=( "aerospace" )
@@ -17,7 +30,7 @@ fi
 error="no"
 for config in ${configs[@]}; do
     # check if folder exists in ~/.config/
-    if [ -d "$HOME/.config/$config" ]; then
+    if [ -d "$CFG_PTH/$config" ]; then
         echo "Config already exists for ${config}"
         error="yes"
     fi 
@@ -29,9 +42,9 @@ if [ "$error" == "yes" ]; then
     read -p "Do you want to delete the conflicting folders? (Y/n): " answer
     if [[ "$answer" == "Y" || "$answer" == "y" || "$answer" == "" ]]; then
         for config in ${configs[@]}; do
-            if [ -d "$HOME/.config/$config" ]; then
-                echo "Deleting $config from ~/.config/"
-                rm -rf "$HOME/.config/$config"
+            if [ -d "$CFG_PTH/$config" ]; then
+                echo "Deleting $config from $CFG_PTH/"
+                rm -rf "$CFG_PTH/$config"
             fi
         done
     fi
@@ -39,12 +52,13 @@ fi
 
 
 for config in ${configs[@]}; do
-    echo "Linking $config to ~/.config/$config"
-    ln -s "$PWD/$config" "$HOME/.config/$config"  
+    echo "Linking $config to $CFG_PTH/$config"
+    ln -s "$PWD/$config" "$CFG_PTH/$config"
+
 done
 
 SCRIPT_SOURCING="#<<< START MAMOCONF INSTALL >>>"
-# ADD source ~/.config/scripts/*.sshel
+# ADD source ~/.config/scripts/*.ssource
 for script in "$HOME/.config/scripts"/*.ssource; do
     if [[ -f "$script" ]]; then
         SCRIPT_SOURCING+="\nsource $script"
