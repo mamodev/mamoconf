@@ -70,8 +70,9 @@ SCRIPT_SOURCING+="\n#<<< END MAMOCONF INSTALL >>>"
 read -p "Install shell configs to system shells? (Y/n): " answer
 if [[ "$answer" != "Y" && "$answer" != "y" && "$answer" != "" ]]; then
     read -p "Do you want a custom path for the shell configs? (Default: no) path: " custom_path
+    echo "Using custom path for shell configs: $custom_path"
+
     if [ -f custom_path ]; then 
-        echo "Using custom path for shell configs: $custom_path"
         if grep -q "#<<< START MAMOCONF INSTALL >>>" "$custom_path"; then
             echo "Removing existing mamoconf block from custom path"
             sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$cutom_path"
