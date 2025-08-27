@@ -1,5 +1,17 @@
 #!/bin/bash
 set -e
+mkdir -p .install
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+# Platform compatibility cmds 
+sed_i() {
+  if [[ "$(uname -s)" = "Darwin" ]]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
 
 # Check if custom config path is passed as arg
 CFG_PTH="$1"
@@ -13,6 +25,9 @@ else
         exit 0
     fi
 fi
+
+
+
 
 # This script install all config folders and files to the home directory
 globals=( "nvim" "alacritty" "scripts")
@@ -58,6 +73,10 @@ for config in ${configs[@]}; do
 done
 
 SCRIPT_SOURCING="#<<< START MAMOCONF INSTALL >>>"
+
+# Install path to current REAL config directory
+SCRIPT_SOURCING+="\nexport MAMOCFG=\"$SCRIPT_DIR\""
+
 # ADD source ~/.config/scripts/*.ssource
 for script in "$CFG_PTH/scripts"/*.ssource; do
     if [[ -f "$script" ]]; then
@@ -75,7 +94,7 @@ if [[ "$answer" != "Y" && "$answer" != "y" && "$answer" != "" ]]; then
     if [ -f "$custom_path" ]; then 
         if grep -q "#<<< START MAMOCONF INSTALL >>>" "$custom_path"; then
             echo "Removing existing mamoconf block from custom path"
-            sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$custom_path"
+	    sed_i '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$custom_path"
         fi
         
         echo -e "$SCRIPT_SOURCING" >> "$custom_path"
@@ -88,10 +107,11 @@ fi
 
 # Check if bashrc present
 if [ -f "$HOME/.bashrc" ]; then
+    echo "installing in $HOME/.bashrc"
     # IF file contains a block with <<< ... >>> Delemiters remove the block from the file and reappend it
     if grep -q "#<<< START MAMOCONF INSTALL >>>" "$HOME/.bashrc"; then
         echo "Removing existing mamoconf block from .bashrc"
-        sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$HOME/.zshrc"
+        sed_i '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$HOME/.bashrc"
     fi
 
     echo -e "$SCRIPT_SOURCING" >> "$HOME/.bashrc"
@@ -99,10 +119,11 @@ fi
 
 # Check for zshrc
 if [ -f "$HOME/.zshrc" ]; then
+    echo "installing in $HOME/.zshrc" 
     # IF file contains a block with <<< ... >>> Delemiters remove the block from the file and reappend it
     if grep -q "#<<< START MAMOCONF INSTALL >>>" "$HOME/.zshrc"; then
         echo "Removing existing mamoconf block from .zshrc"
-        sed -i '' '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$HOME/.zshrc"
+        sed_i '/#<<< START MAMOCONF INSTALL >>>/,/#<<< END MAMOCONF INSTALL >>>/d' "$HOME/.zshrc"
     fi
 
     echo -e "$SCRIPT_SOURCING" >> "$HOME/.zshrc"
