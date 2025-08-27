@@ -270,6 +270,7 @@ require("lazy").setup({
         {
             "zbirenbaum/copilot.lua",
             event = "VeryLazy",
+            enabled= vim.fn.executable("node") == 1,
             config = function ()
                 require("copilot").setup({
                     suggestion = {
@@ -348,8 +349,9 @@ require("lazy").setup({
 
                 -- 3) Tell mason-lspconfig which servers to ensure & how to set them up
                 mlsp.setup({
+                    
                     ensure_installed = {
-                        "pyright", -- Python
+                        "basedpyright", -- Python
                         "clangd",  -- C, C++, CUDA
                         "lua_ls",  -- Lua
                     },
