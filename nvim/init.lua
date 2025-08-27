@@ -12,7 +12,6 @@ vim.opt.smartindent = true
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.timeoutlen = 400
-vim.opt.clipboard = 'unnamedplus'
 vim.opt.signcolumn = "yes"
 
 vim.opt.undofile = true
@@ -21,6 +20,11 @@ vim.cmd(":hi statusline guibg=NONE")
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+
+vim.opt.clipboard = 'unnamedplus'
+if vim.env.SSH_TTY then
+    vim.g.clipboard = 'osc52'
+end
 
 local issue_insert_nop = function()
     local seq = vim.api.nvim_replace_termcodes(" <BS>", true, false, true)
@@ -347,7 +351,6 @@ require("lazy").setup({
                     ensure_installed = {
                         "pyright", -- Python
                         "clangd",  -- C, C++, CUDA
-                        "gopls",   -- Go
                         "lua_ls",  -- Lua
                     },
                     automatic_installation = true,
