@@ -30,7 +30,7 @@ fi
 
 
 # This script install all config folders and files to the home directory
-globals=( "nvim" "alacritty" "scripts")
+globals=( "nvim" "alacritty" "scripts" "tmux" )
 macos=( "aerospace" )
 linux=( )
 

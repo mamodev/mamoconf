@@ -26,6 +26,27 @@ if vim.env.SSH_TTY then
     vim.g.clipboard = 'osc52'
 end
 
+local autosave_enabled = false
+local autosave_group = vim.api.nvim_create_augroup("AutosaveGroup", { clear = true })
+
+vim.api.nvim_create_user_command("Autosave", function()
+  if autosave_enabled then
+    vim.api.nvim_clear_autocmds({ group = autosave_group, buffer = 0 })
+    autosave_enabled = false
+    print("Autosave disabled for current buffer")
+  else
+    vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+      group = autosave_group,
+      buffer = 0,
+      callback = function()
+        vim.cmd("silent! write")
+      end,
+    })
+    autosave_enabled = true
+    print("Autosave enabled for current buffer")
+  end
+end, {})
+
 local issue_insert_nop = function()
     local seq = vim.api.nvim_replace_termcodes(" <BS>", true, false, true)
     vim.api.nvim_feedkeys(seq, "n", true)
@@ -48,56 +69,57 @@ vim.keymap.set('n', '-', ":Oil<CR>", { desc = "Open Oil file explorer" })
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
 vim.keymap.set('n', '<leader>w', ':write<CR>')
 vim.keymap.set('n', '<leader>q', ':quit<CR>')
-vim.keymap.set('i', 'jk', esc_insert_mode, { expr = true, silent = true })
-vim.keymap.set('i', '<Esc>', esc_insert_mode, { expr = true, silent = true })
+vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition)
+-- vim.keymap.set('i', 'jk', esc_insert_mode, { expr = true, silent = true })
+-- vim.keymap.set('i', '<Esc>', esc_insert_mode, { expr = true, silent = true })
 
 vim.keymap.set('n', '<leader>ff', ':Pick files<CR>')
 vim.keymap.set('n', '<leader>fg', ':Pick grep live<CR>')
 
-vim.keymap.set('i', '<D-l>', function()
-    if pcall(require, 'copilot') then
-        local cp = require('copilot.suggestion')
-        if not vim.b.copilot_suggestion_hidden then
-            cp.accept_line()
-            vim.b.copilot_suggestion_hidden = true
-        else
-            vim.b.copilot_suggestion_hidden = false
-            issue_insert_nop()
-        end
-    end
-end, {expr = true, silent = true})
-
-vim.keymap.set('i', '<D-Bslash>', function()
-    if pcall(require, 'copilot') then
-        local cp = require('copilot.suggestion')
-        if not vim.b.copilot_suggestion_hidden then
-            cp.accept_word()
-            vim.b.copilot_suggestion_hidden = true
-        else
-            vim.b.copilot_suggestion_hidden = false
-            issue_insert_nop()
-        end
-    end
-end, {expr = true, silent = true})
-
-vim.keymap.set('i', '<D-]>', function()
-    if pcall(require, 'copilot') then
-        local cp = require('copilot.suggestion')
-        if cp.is_visible() then
-            cp.next()
-        end
-    end
-end, {expr = true, silent = true})
-
-vim.keymap.set('i', '<D-[>', function()
-    if pcall(require, 'copilot') then
-        local cp = require('copilot.suggestion')
-        if cp.is_visible() then
-            cp.prev()
-        end
-    end
-end, {expr = true, silent = true})
-
+-- vim.keymap.set('i', '<D-l>', function()
+--     if pcall(require, 'copilot') then
+--         local cp = require('copilot.suggestion')
+--         if not vim.b.copilot_suggestion_hidden then
+--             cp.accept_line()
+--             vim.b.copilot_suggestion_hidden = true
+--         else
+--             vim.b.copilot_suggestion_hidden = false
+--             issue_insert_nop()
+--         end
+--     end
+-- end, {expr = true, silent = true})
+--
+-- vim.keymap.set('i', '<D-Bslash>', function()
+--     if pcall(require, 'copilot') then
+--         local cp = require('copilot.suggestion')
+--         if not vim.b.copilot_suggestion_hidden then
+--             cp.accept_word()
+--             vim.b.copilot_suggestion_hidden = true
+--         else
+--             vim.b.copilot_suggestion_hidden = false
+--             issue_insert_nop()
+--         end
+--     end
+-- end, {expr = true, silent = true})
+--
+-- vim.keymap.set('i', '<D-]>', function()
+--     if pcall(require, 'copilot') then
+--         local cp = require('copilot.suggestion')
+--         if cp.is_visible() then
+--             cp.next()
+--         end
+--     end
+-- end, {expr = true, silent = true})
+--
+-- vim.keymap.set('i', '<D-[>', function()
+--     if pcall(require, 'copilot') then
+--         local cp = require('copilot.suggestion')
+--         if cp.is_visible() then
+--             cp.prev()
+--         end
+--     end
+-- end, {expr = true, silent = true})
+--
 
 -- vim.keymap.set('i', '<S-D-Bslash>', function()
 --     if pcall(require, 'copilot') then
@@ -267,37 +289,37 @@ require("lazy").setup({
                 vim.cmd([[colorscheme tokyonight]])
             end,
         },
-        {
-            "zbirenbaum/copilot.lua",
-            event = "VeryLazy",
-            enabled= vim.fn.executable("node") == 1,
-            config = function ()
-                require("copilot").setup({
-                    suggestion = {
-                        enabled = true,
-                        auto_trigger = true,
-                        trigger_on_accept = false,
-                        keymaps = {
-                          accept = false,
-                          accept_word = false,
-                          accept_line = false,
-                          next = false,
-                          prev = false,
-                          dismiss = false,
-                        }
-                    },
-                    panel = {
-                        enabled = false
-                    },
-                    filetypes = {
-                        ["*"] = true
-                    }
-                })
-
-                vim.b.copilot_suggestion_hidden = true
-
-            end,
-        },
+        -- {
+        --     "zbirenbaum/copilot.lua",
+        --     event = "VeryLazy",
+        --     enabled= vim.fn.executable("node") == 1,
+        --     config = function ()
+        --         require("copilot").setup({
+        --             suggestion = {
+        --                 enabled = true,
+        --                 auto_trigger = true,
+        --                 trigger_on_accept = false,
+        --                 keymaps = {
+        --                   accept = false,
+        --                   accept_word = false,
+        --                   accept_line = false,
+        --                   next = false,
+        --                   prev = false,
+        --                   dismiss = false,
+        --                 }
+        --             },
+        --             panel = {
+        --                 enabled = false
+        --             },
+        --             filetypes = {
+        --                 ["*"] = true
+        --             }
+        --         })
+        --
+        --         vim.b.copilot_suggestion_hidden = false
+        --
+        --     end,
+        -- },
         {
             --https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/lazy/lsp.lua
             "neovim/nvim-lspconfig",
@@ -314,7 +336,7 @@ require("lazy").setup({
                         },
                     },
                 },
-                "zbirenbaum/copilot-cmp",
+                -- "zbirenbaum/copilot-cmp",
                 "stevearc/conform.nvim",
                 "williamboman/mason.nvim",
                 "williamboman/mason-lspconfig.nvim",
@@ -339,9 +361,9 @@ require("lazy").setup({
                 local lspconfig    = require("lspconfig")
                 local cmp          = require("cmp")
                 local cmp_nvim_lsp = require("cmp_nvim_lsp")
-                local copilot_cmp  = require("copilot_cmp")
+                -- local copilot_cmp  = require("copilot_cmp")
 
-                copilot_cmp.setup()
+                -- copilot_cmp.setup()
                 mason.setup()
 
                 -- 2) Prepare capabilities for nvim-cmp
@@ -351,7 +373,6 @@ require("lazy").setup({
                 mlsp.setup({
                     
                     ensure_installed = {
-                        "basedpyright", -- Python
                         "clangd",  -- C, C++, CUDA
                         "lua_ls",  -- Lua
                     },

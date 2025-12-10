@@ -2,7 +2,7 @@
 normal = { family = "0xProto Nerd Font Mono", style = "Regular" }
 italic = { family = "0xProto Nerd Font Mono", style = "Italic" }
 bold = { family = "0xProto Nerd Font Mono", style = "Bold" }
-size = 18
+size = 14
 [keyboard]
 bindings = [
     { key = "W", mods = "Command", action = "None" },

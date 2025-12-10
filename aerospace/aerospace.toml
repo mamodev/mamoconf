@@ -38,12 +38,12 @@ automatically-unhide-macos-hidden-apps = true
 	alt-shift-q = 'close --quit-if-last-window'	
 
 	# i3 wraps focus by default
-	alt-j =         'focus --boundaries-action wrap-around-the-workspace down'
-	alt-k =         'focus --boundaries-action wrap-around-the-workspace up'
-	alt-l =         'focus --boundaries-action wrap-around-the-workspace right'
-	alt-h = 	'focus --boundaries-action wrap-around-the-workspace left'
-	alt-left = 	'focus --boundaries-action wrap-around-the-workspace dfs-next'
-	alt-right = 	'focus --boundaries-action wrap-around-the-workspace dfs-prev'
+	alt-j =         ['focus --boundaries-action wrap-around-the-workspace down', 'move-mouse window-lazy-center']
+	alt-k =         ['focus --boundaries-action wrap-around-the-workspace up', 'move-mouse window-lazy-center']
+	alt-l =         ['focus --boundaries-action wrap-around-the-workspace right', 'move-mouse window-lazy-center']
+	alt-h = 	    ['focus --boundaries-action wrap-around-the-workspace left', 'move-mouse window-lazy-center']
+	alt-left = 	    ['focus --boundaries-action wrap-around-the-workspace dfs-next', 'move-mouse window-lazy-center']
+	alt-right = 	['focus --boundaries-action wrap-around-the-workspace dfs-prev', 'move-mouse window-lazy-center']
 
 	alt-shift-j = 'move down'
 	alt-shift-k = 'move up'

@@ -5,3 +5,18 @@ alias vi=nvim
 alias gcomm="git commit -m "
 alias gadd="git add ."
 alias gpusho="git push origin main"
+alias gitgc="git gc --aggressive --prune=now"
+
+pdf() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: use the default PDF viewer (Preview.app)
+        open "$@" >/dev/null 2>&1 &
+    else
+        # Linux: use Zathura
+        nohup zathura "$@" >/dev/null 2>&1 & disown
+    fi
+}
+
+fork() {
+  alacritty --working-directory "$PWD" & disown
+}
